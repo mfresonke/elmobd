@@ -111,6 +111,17 @@ func (cmd *UIntCommand) ValueAsLit() string {
 	return fmt.Sprintf("%d", cmd.Value)
 }
 
+// UInt64Command is just a shortcut for commands that retrieve unsigned
+// integer values from the ELM327 device.
+type UInt64Command struct {
+	Value uint64
+}
+
+// ValueAsLit retrieves the value as a literal representation.
+func (cmd *UInt64Command) ValueAsLit() string {
+	return fmt.Sprintf("%d", cmd.Value)
+}
+
 /*==============================================================================
  * Specific types
  */
@@ -565,6 +576,173 @@ func (cmd *FuelPressure) SetValue(result *Result) error {
 	}
 
 	cmd.Value = uint32(payload) * 3
+
+	return nil
+}
+
+// Odometer gets the odometer reading in decimeters (km/10)
+type Odometer struct {
+	baseCommand
+	UIntCommand
+}
+
+// NewOdometer creates a new NewOdometer with the right parameters.
+func NewOdometer() *Odometer {
+	return &Odometer{
+		baseCommand{SERVICE_01_ID, 166, 4, "odometer"},
+		UIntCommand{},
+	}
+}
+
+// SetValue processes the byte array value into the right unsigned integer value.
+func (cmd *Odometer) SetValue(result *Result) error {
+	payload, err := result.PayloadAsUInt32()
+
+	if err != nil {
+		return err
+	}
+
+	cmd.Value = payload
+
+	return nil
+}
+
+// HybridBatteryPackRemainingLife gets the HybridBatteryPackRemainingLife reading in %
+type HybridBatteryPackRemainingLife struct {
+	baseCommand
+	FloatCommand
+}
+
+// NewHybridBatteryPackRemainingLife creates a new NewHybridBatteryPackRemainingLife with the right parameters.
+func NewHybridBatteryPackRemainingLife() *HybridBatteryPackRemainingLife {
+	return &HybridBatteryPackRemainingLife{
+		baseCommand{SERVICE_01_ID, 91, 1, "hybrid_battery_pack_remaining_life"},
+		FloatCommand{},
+	}
+}
+
+// SetValue processes the byte array value into the right unsigned integer value.
+func (cmd *HybridBatteryPackRemainingLife) SetValue(result *Result) error {
+	payload, err := result.PayloadAsByte()
+
+	if err != nil {
+		return err
+	}
+
+	cmd.Value = float32(payload) / 255
+
+	return nil
+}
+
+// HybridInfo gets the HybridInfo reading in decimeters (km/10)
+type HybridInfo struct {
+	baseCommand
+	Value uint64
+}
+
+// NewHybridInfo creates a new NewHybridInfo with the right parameters.
+func NewHybridInfo() *HybridInfo {
+	return &HybridInfo{
+		baseCommand{SERVICE_01_ID, 154, 6, "hybrid_info"},
+		0,
+	}
+}
+
+// SetValue processes the byte array value into the right unsigned integer value.
+func (cmd *HybridInfo) SetValue(result *Result) error {
+	payload, err := result.PayloadAsUInt64()
+
+	if err != nil {
+		return err
+	}
+
+	cmd.Value = payload
+
+	return nil
+}
+
+// ValueAsLit retrieves the value as a literal representation.
+func (cmd *HybridInfo) ValueAsLit() string {
+	return fmt.Sprintf("%x", cmd.Value)
+}
+
+// EngineFuelRateGS gets the EngineFuelRateGS reading in g/s
+type EngineFuelRateGS struct {
+	baseCommand
+	UIntCommand
+}
+
+// NewEngineFuelRateGS creates a new NewEngineFuelRateGS with the right parameters.
+func NewEngineFuelRateGS() *EngineFuelRateGS {
+	return &EngineFuelRateGS{
+		baseCommand{SERVICE_01_ID, 157, 4, "engine_fuel_rate_gs"},
+		UIntCommand{},
+	}
+}
+
+// SetValue processes the byte array value into the right unsigned integer value.
+func (cmd *EngineFuelRateGS) SetValue(result *Result) error {
+	payload, err := result.PayloadAsUInt32()
+
+	if err != nil {
+		return err
+	}
+
+	cmd.Value = payload
+
+	return nil
+}
+
+// EngineFuelRate gets the EngineFuelRate reading in l/hr
+type EngineFuelRate struct {
+	baseCommand
+	FloatCommand
+}
+
+// NewEngineFuelRate creates a new NewEngineFuelRate with the right parameters.
+func NewEngineFuelRate() *EngineFuelRate {
+	return &EngineFuelRate{
+		baseCommand{SERVICE_01_ID, 94, 2, "engine_fuel_rate"},
+		FloatCommand{},
+	}
+}
+
+// SetValue processes the byte array value into the right unsigned integer value.
+func (cmd *EngineFuelRate) SetValue(result *Result) error {
+	payload, err := result.PayloadAsUInt32()
+
+	if err != nil {
+		return err
+	}
+
+	cmd.Value = float32(payload) / 20
+
+	return nil
+}
+
+// RelativeAcceleratorPedalPosition gets the RelativeAcceleratorPedalPosition reading in %
+type RelativeAcceleratorPedalPosition struct {
+	baseCommand
+	FloatCommand
+}
+
+// NewRelativeAcceleratorPedalPosition creates a new NewRelativeAcceleratorPedalPosition with the right parameters.
+func NewRelativeAcceleratorPedalPosition() *RelativeAcceleratorPedalPosition {
+	return &RelativeAcceleratorPedalPosition{
+		baseCommand{SERVICE_01_ID, 90, 1, "relative_accelerator_pedal_position"},
+		FloatCommand{},
+	}
+}
+
+// SetValue processes the byte array value into the right unsigned integer value.
+func (cmd *RelativeAcceleratorPedalPosition) SetValue(result *Result) error {
+	payload, err := result.PayloadAsByte()
+
+	if err != nil {
+		return err
+	}
+
+	cmd.Value = float32(payload) / 255
 
 	return nil
 }
